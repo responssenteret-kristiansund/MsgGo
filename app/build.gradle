@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localProperties.load(new FileInputStream(localPropertiesFile))
+}
+
 android {
     namespace "top.yztz.msggo"
     compileSdk = 35
@@ -31,14 +37,15 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    /*
     applicationVariants.all { variant ->
         variant.outputs.all {
             def abi = filters.find { it.filterType == 'ABI' }?.identifier ?: "universal"
-            def typeSuffix = variant.buildType.name == 'release' ? "" : "-unsigned"
+            def typeSuffix = variant.buildType.name == 'release' && variant.signingReady ? "" : "-unsigned"
             outputFileName = "MsgGo-${variant.versionName}-${abi}${typeSuffix}.apk"
         }
     }
-
+    */
 }
 
 repositories {

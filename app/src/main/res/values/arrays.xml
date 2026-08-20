@@ -21,5 +21,6 @@
         <item>auto</item>
         <item>en-US</item>
         <item>zh-CN</item>
+        <item>nb</item>
     </string-array>
 </resources>

@@ -165,7 +165,11 @@ public class SendingActivity extends AppCompatActivity implements MessageService
 
         topAppBar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_pause_resume) {
-                togglePauseResume();
+                if (currentIndex >= messages.size()) {
+                    navigateToHome();
+                } else {
+                    togglePauseResume();
+                }
                 return true;
             }
             return false;
@@ -257,17 +261,32 @@ public class SendingActivity extends AppCompatActivity implements MessageService
     }
 
     private void checkCompletion() {
-        if (currentIndex >= messages.size() && confirmedCount >= messages.size()) {
-            currentState = SendingState.COMPLETED;
-            if (isBound) {
-                service.finishSession(true);
-            }
-            updateUI();
-            Log.i(TAG, "All messages sent and confirmed!");
+        if (currentIndex >= messages.size()) {
+            if (confirmedCount >= messages.size()) {
+                currentState = SendingState.COMPLETED;
+                if (isBound) {
+                    service.finishSession(true);
+                }
+                updateUI();
+                Log.i(TAG, "All messages sent and confirmed!");
 
-            // Returns to home page after all sending is complete
-            long COMPLETION_SCREEN_DELAY_MS = 1000L;
-            handler.postDelayed(this::navigateToHome, COMPLETION_SCREEN_DELAY_MS);
+                // Returns to home page after all sending is complete
+                long COMPLETION_SCREEN_DELAY_MS = 1500L;
+                handler.postDelayed(this::navigateToHome, COMPLETION_SCREEN_DELAY_MS);
+            } else {
+                // All submitted, but waiting for confirmations.
+                // We update the UI to show we are done with sending, but still waiting for reports.
+                updateUI();
+                
+                // If it takes too long (e.g. 15s after all submitted), just auto-finish
+                handler.postDelayed(() -> {
+                    if (currentState == SendingState.SENDING && currentIndex >= messages.size()) {
+                        Log.w(TAG, "Completion timeout reached. Finishing anyway.");
+                        confirmedCount = messages.size(); 
+                        checkCompletion();
+                    }
+                }, 15000L);
+            }
         }
     }
 
@@ -310,7 +329,11 @@ public class SendingActivity extends AppCompatActivity implements MessageService
     private void updateUI() {
         switch (currentState) {
             case SENDING:
-                topAppBar.setTitle(R.string.sending);
+                if (currentIndex >= messages.size()) {
+                    topAppBar.setTitle(R.string.sending_completed);
+                } else {
+                    topAppBar.setTitle(R.string.sending);
+                }
                 updateMenuIcon(true);
                 break;
             case PAUSED:
@@ -331,7 +354,12 @@ public class SendingActivity extends AppCompatActivity implements MessageService
     private void updateMenuIcon(boolean isSending) {
         MenuItem item = topAppBar.getMenu().findItem(R.id.action_pause_resume);
         if (item != null) {
-            item.setIcon(isSending ? R.drawable.ic_pause : R.drawable.ic_play);
+            if (currentIndex >= messages.size()) {
+                item.setIcon(R.drawable.ic_check_circle);
+                item.setEnabled(true);
+            } else {
+                item.setIcon(isSending ? R.drawable.ic_pause : R.drawable.ic_play);
+            }
         }
     }
 
