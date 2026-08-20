@@ -264,6 +264,10 @@ public class SendingActivity extends AppCompatActivity implements MessageService
             }
             updateUI();
             Log.i(TAG, "All messages sent and confirmed!");
+
+            // Returns to home page after all sending is complete
+            long COMPLETION_SCREEN_DELAY_MS = 1000L;
+            handler.postDelayed(this::navigateToHome, COMPLETION_SCREEN_DELAY_MS);
         }
     }
 
