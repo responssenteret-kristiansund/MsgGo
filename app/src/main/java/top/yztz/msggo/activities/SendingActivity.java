@@ -48,6 +48,7 @@ import top.yztz.msggo.data.DataModel;
 import top.yztz.msggo.data.Message;
 import top.yztz.msggo.data.MessageState;
 import top.yztz.msggo.data.SettingManager;
+import top.yztz.msggo.data.Settings;
 import top.yztz.msggo.services.MessageService;
 import top.yztz.msggo.util.FileUtil;
 
@@ -271,21 +272,21 @@ public class SendingActivity extends AppCompatActivity implements MessageService
                 Log.i(TAG, "All messages sent and confirmed!");
 
                 // Returns to home page after all sending is complete
-                long COMPLETION_SCREEN_DELAY_MS = 1500L;
-                handler.postDelayed(this::navigateToHome, COMPLETION_SCREEN_DELAY_MS);
+                long completionDelay = SettingManager.getFinishDelay();
+                handler.postDelayed(this::navigateToHome, completionDelay);
             } else {
                 // All submitted, but waiting for confirmations.
                 // We update the UI to show we are done with sending, but still waiting for reports.
                 updateUI();
                 
-                // If it takes too long (e.g. 15s after all submitted), just auto-finish
+                // If it takes too long (e.g. 10s after all submitted), just auto-finish
                 handler.postDelayed(() -> {
                     if (currentState == SendingState.SENDING && currentIndex >= messages.size()) {
                         Log.w(TAG, "Completion timeout reached. Finishing anyway.");
                         confirmedCount = messages.size(); 
                         checkCompletion();
                     }
-                }, 15000L);
+                }, Settings.SEND_FINISH_DELAY_DEFAULT);
             }
         }
     }

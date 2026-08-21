@@ -32,6 +32,7 @@ public class SettingManager {
     private static SharedPreferences.Editor mEditor;
     private static final HashMap<String, Object> DefaultPropMap = new HashMap<>();
 
+    private static final String SEND_FINISH_KEY = "send_finish_v1";
     private static final String SEND_DELAY_KEY = "send_delay_v1";
     private static final String SEND_DELAY_RANDOMIZATION_KEY = "send_delay_randomization_v1";
     private static final String EDIT_AFTER_IMPORT_KEY = "edit_after_import_v1";
@@ -60,6 +61,7 @@ public class SettingManager {
         DefaultPropMap.put(PRIVACY_ACCEPTED_KEY, Settings.PRIVACY_ACCEPTED_DEFAULT);
         DefaultPropMap.put(DISCLAIMER_ACCEPTED_KEY, Settings.DISCLAIMER_ACCEPTED_DEFAULT);
         DefaultPropMap.put(DARK_MODE_KEY, DARK_MODE_SYSTEM);
+        DefaultPropMap.put(SEND_FINISH_KEY, Settings.SEND_FINISH_DELAY_DEFAULT);
         DefaultPropMap.put(SENSITIVE_WORD_FILTER_KEY, true);
     }
 
@@ -75,6 +77,8 @@ public class SettingManager {
                 if (obj instanceof Integer) mEditor.putInt(key, (Integer) obj);
                 else if (obj instanceof String) mEditor.putString(key, (String) obj);
                 else if (obj instanceof Boolean) mEditor.putBoolean(key, (Boolean) obj);
+                else if (obj instanceof Long) mEditor.putLong(key, (Long) obj);
+                else if (obj instanceof Float) mEditor.putFloat(key, (Float) obj);
             }
         }
         mEditor.apply();
@@ -99,6 +103,14 @@ public class SettingManager {
         mEditor.apply();
     }
 
+    public static void setFinishDelay(long num) {
+        mEditor.putLong(SEND_FINISH_KEY, num);
+        mEditor.apply();
+    }
+
+    public static long getFinishDelay() {
+        return mSp.getLong(SEND_FINISH_KEY, Settings.SEND_FINISH_DELAY_DEFAULT);
+    }
     public static float getSmsRate() {
         return mSp.getFloat(SMS_RATE_KEY, Settings.SMS_RATE_DEFAULT);
     }

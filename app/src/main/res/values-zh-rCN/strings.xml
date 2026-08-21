@@ -57,6 +57,8 @@
     <string name="auto_open_editor_summary">导入数据后自动进入编辑界面</string>
     <string name="send_delay">发送间隔</string>
     <string name="send_delay_summary">设置每条短信发送后的延迟时间，规避运营商拦截</string>
+    <string name="send_finish_delay">完成延迟</string>
+    <string name="send_finish_delay_summary">任务完成后返回主页前的延迟时间</string>
     <string name="randomize_delay">随机化延迟</string>
     <string name="randomize_delay_summary">在最小值与设定值之间取随机延迟</string>
     <string name="sms_cost">短信资费</string>

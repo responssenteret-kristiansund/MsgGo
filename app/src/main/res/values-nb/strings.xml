@@ -58,6 +58,8 @@
     <string name="auto_open_editor_summary">Rediger etter import</string>
     <string name="send_delay">Forsinkelse mellom sendinger</string>
     <string name="send_delay_summary">Forsinkelse mellom hver SMS for å unngå blokkering fra operatør</string>
+    <string name="send_finish_delay">Forsinkelse ved fullføring</string>
+    <string name="send_finish_delay_summary">Forsinkelse før retur til hjem-skjerm etter fullføring</string>
     <string name="randomize_delay">Tilfeldig forsinkelse</string>
     <string name="randomize_delay_summary">Vent i et tilfeldig tidsintervall</string>
     <string name="sms_cost">SMS-takst</string>

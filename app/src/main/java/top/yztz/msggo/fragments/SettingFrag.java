@@ -66,10 +66,11 @@ public class SettingFrag extends Fragment {
     private MaterialSwitch mSwitchAutoEditor, mSwitchRandomizeDelay, mSwitchSensitiveWord;
     private MaterialCardView mCardClearCache;
     private View mRowExportLog, mRowAboutApp, mRowLanguage, mRowCheckUpdate, mRowDarkMode;
-    private TextView mTvCache, mTvDelayValue, mTvSmsRateValue, mTvLanguage, mTvDarkModeSummary;
+    private TextView mTvCache, mTvDelayValue, mTvFinishDelayValue, mTvSmsRateValue, mTvLanguage, mTvDarkModeSummary;
     private LinearLayout mCardSmsRate;
     private boolean isUpdatingUI = false;
     private Slider mSliderDelay;
+    private Slider mSliderFinishDelay;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -110,6 +111,12 @@ public class SettingFrag extends Fragment {
         mSliderDelay.setValueTo(Settings.SEND_DELAY_MAX);
         mSliderDelay.setStepSize(Settings.SEND_DELAY_STEP_UNIT);
 
+        mTvFinishDelayValue = view.findViewById(R.id.tv_finish_delay_value);
+        mSliderFinishDelay = view.findViewById(R.id.slider_finish_delay);
+        mSliderFinishDelay.setValueFrom(Settings.SEND_FINISH_DELAY_MIN);
+        mSliderFinishDelay.setValueTo(Settings.SEND_FINISH_DELAY_MAX);
+        mSliderFinishDelay.setStepSize(Settings.SEND_DELAY_STEP_UNIT);
+
         setupListeners();
         showInfo();
     }
@@ -126,6 +133,19 @@ public class SettingFrag extends Fragment {
             if (!isUpdatingUI) {
                 SettingManager.setRandomizeDelay(isChecked);
             }
+        });
+
+        mSliderFinishDelay.addOnChangeListener((slider, value, fromUser) -> {
+            if (fromUser) {
+                SettingManager.setFinishDelay((long) value);
+                float seconds = value / 1000f;
+                mTvFinishDelayValue.setText(String.format(Locale.getDefault(), "%.1fs", seconds));
+            }
+        });
+
+        mSliderFinishDelay.setLabelFormatter(value -> {
+            float seconds = value / 1000f;
+            return String.format(Locale.getDefault(), "%.1fs", seconds);
         });
 
         // Auto-save: Slider Delay
@@ -354,6 +374,10 @@ public class SettingFrag extends Fragment {
         float delay = SettingManager.getDelay();
         mSliderDelay.setValue(delay);
         mTvDelayValue.setText(String.format(Locale.getDefault(),"%.1fs", delay/1000f));
+
+        float finishDelay = SettingManager.getFinishDelay();
+        mSliderFinishDelay.setValue(finishDelay);
+        mTvFinishDelayValue.setText(String.format(Locale.getDefault(), "%.1fs", finishDelay / 1000f));
 
         // Set switches
         mSwitchAutoEditor.setChecked(SettingManager.autoEnterEditor());
