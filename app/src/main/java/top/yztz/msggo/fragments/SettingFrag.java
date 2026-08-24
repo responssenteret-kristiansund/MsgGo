@@ -63,7 +63,7 @@ import top.yztz.msggo.util.ToastUtil;
 public class SettingFrag extends Fragment {
     private static final String TAG = "SettingFrag";
     private Context context;
-    private MaterialSwitch mSwitchAutoEditor, mSwitchRandomizeDelay, mSwitchSensitiveWord;
+    private MaterialSwitch mSwitchAutoEditor, mSwitchRandomizeDelay;
     private MaterialCardView mCardClearCache;
     private View mRowExportLog, mRowAboutApp, mRowLanguage, mRowCheckUpdate, mRowDarkMode;
     private TextView mTvCache, mTvDelayValue, mTvFinishDelayValue, mTvSmsRateValue, mTvLanguage, mTvDarkModeSummary;
@@ -104,7 +104,6 @@ public class SettingFrag extends Fragment {
         mRowCheckUpdate = view.findViewById(R.id.row_check_update);
         mRowDarkMode = view.findViewById(R.id.row_dark_mode);
         mTvDarkModeSummary = view.findViewById(R.id.tv_dark_mode_summary);
-        mSwitchSensitiveWord = view.findViewById(R.id.switch_sensitive_word);
 
         mSliderDelay = view.findViewById(R.id.slider_delay);
         mSliderDelay.setValueFrom(Settings.SEND_DELAY_MIN);
@@ -115,12 +114,11 @@ public class SettingFrag extends Fragment {
         mSliderFinishDelay = view.findViewById(R.id.slider_finish_delay);
         mSliderFinishDelay.setValueFrom(Settings.SEND_FINISH_DELAY_MIN);
         mSliderFinishDelay.setValueTo(Settings.SEND_FINISH_DELAY_MAX);
-        mSliderFinishDelay.setStepSize(Settings.SEND_DELAY_STEP_UNIT);
+        mSliderFinishDelay.setStepSize(Settings.SEND_FINISH_DELAY_STEP_UNIT);
 
         setupListeners();
         showInfo();
     }
-
     private void setupListeners() {
         // Auto-save: Auto Editor Switch
         mSwitchAutoEditor.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -161,33 +159,6 @@ public class SettingFrag extends Fragment {
             float seconds = value / 1000f; // 转换回秒数
             return String.format(Locale.getDefault(), "%.1fs", seconds);
         });
-
-        // Sensitive Word Filter
-        mSwitchSensitiveWord.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isUpdatingUI) return;
-            if (!isChecked) {
-                // 如果用户试图关闭，弹窗警告
-                new MaterialAlertDialogBuilder(context)
-                        .setTitle(getString(R.string.sensitive_word_filter_dev_title))
-                        .setMessage(getString(R.string.sensitive_word_filter_dev_msg))
-                        .setPositiveButton(getString(R.string.disable), (dialog, which) -> {
-                            SettingManager.setSensitiveWordFilterEnabled(false);
-                            showInfo();
-                        })
-                        .setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
-                            // 还原开关状态
-                            isUpdatingUI = true;
-                            mSwitchSensitiveWord.setChecked(true);
-                            isUpdatingUI = false;
-                        })
-                        .setCancelable(false)
-                        .show();
-            } else {
-                SettingManager.setSensitiveWordFilterEnabled(true);
-                showInfo();
-            }
-        });
-
         // Dark Mode
         mRowDarkMode.setOnClickListener(v -> {
             String[] options = {
@@ -382,7 +353,6 @@ public class SettingFrag extends Fragment {
         // Set switches
         mSwitchAutoEditor.setChecked(SettingManager.autoEnterEditor());
         mSwitchRandomizeDelay.setChecked(SettingManager.isRandomizeDelay());
-        mSwitchSensitiveWord.setChecked(SettingManager.isSensitiveWordFilterEnabled());
 
         // Display dark mode summary
         int darkMode = SettingManager.getDarkMode();

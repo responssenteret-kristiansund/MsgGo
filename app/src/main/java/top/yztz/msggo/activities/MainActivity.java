@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity implements HomeFrag.DataLoad
     private BottomNavigationView nMenu;
     private LinearProgressIndicator indicator;
     private ViewPager2 viewPager;
-    private ImageView ivHeaderImage;
     private List<String> permissionsToRequest;
 
     /**
@@ -110,11 +109,8 @@ public class MainActivity extends AppCompatActivity implements HomeFrag.DataLoad
                 String newTitle = position == 0 ? getString(R.string.title_home) : getString(R.string.title_settings);
                 int menuItemId = position == 0 ? R.id.nav_home : R.id.nav_settings;
 
-                int newImageRes = position == 0 ? R.drawable.red_panda_bamboo : R.drawable.red_panda_grape;
-
                 if (!initiated) {
                     mCollapsingToolbarLayout.setTitle(newTitle);
-                    ivHeaderImage.setImageResource(newImageRes);
                     initiated = true;
                 } else {
                     // Animate title
@@ -124,19 +120,6 @@ public class MainActivity extends AppCompatActivity implements HomeFrag.DataLoad
                             .withEndAction(() -> {
                                 mCollapsingToolbarLayout.setTitle(newTitle);
                                 mCollapsingToolbarLayout.animate()
-                                        .alpha(1f)
-                                        .setDuration(120)
-                                        .start();
-                            })
-                            .start();
-
-                    // Animate image with same animation
-                    ivHeaderImage.animate()
-                            .alpha(0.1f)
-                            .setDuration(120)
-                            .withEndAction(() -> {
-                                ivHeaderImage.setImageResource(newImageRes);
-                                ivHeaderImage.animate()
                                         .alpha(1f)
                                         .setDuration(120)
                                         .start();
@@ -285,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements HomeFrag.DataLoad
         nMenu = findViewById(R.id.bottom_navigation);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         indicator = findViewById(R.id.progress);
-        ivHeaderImage = findViewById(R.id.iv_header_image);
         
         // Check permissions
         List<String> permissions = new ArrayList<>();

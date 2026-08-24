@@ -50,7 +50,7 @@
     <string name="no_data_imported">Ingen data importert</string>
     <string name="send_section_title">Dashbord</string>
     <string name="history_section_title">Historikk</string>
-    <string name="empty_history">Tom historikk~</string>
+    <string name="empty_history">Tom historikk</string>
 
     <!-- Setting Fragment -->
     <string name="category_features">Funksjoner</string>
@@ -123,7 +123,7 @@
     <string name="select_number_column_dialog_title">Velg nummerkolonne</string>
     <string name="preview_title">Forhåndsvisning av melding</string>
     <string name="preview_msg_format">Mottaker: %1$s\nForhåndsvisning:\n%2$s</string>
-    <string name="no_recipients_selected">Ingen mottakere valgt ennå~</string>
+    <string name="no_recipients_selected">Ingen mottakere valgt ennå</string>
     <string name="confirm_send_title">Bekreft sending</string>
     <string name="confirm_send_msg_format">Er du sikker på at du vil sende SMS til %1$d valgte kontakter?\nEstimert kostnad: %2$.2f kr</string>
     <string name="send_now">Send nå</string>
@@ -175,7 +175,7 @@
     <string name="slot_description">plass %1$d · %2$s</string>
     <string name="tip_sms_preview">tips: trykk på raden for å forhåndsvise</string>
     <string name="preview_and_send">Forhåndsvis og send</string>
-    <string name="edit_hint">Skriv noe~</string>
+    <string name="edit_hint">Skriv no~</string>
     <string name="file_too_large">Filstørrelsen overskrider grensen (> %1$s)</string>
     <string name="file_too_much_row">Filen inneholder for mange rader (> %1$d)</string>
     <string name="deduplication_result">Fjernet %1$d dupliserte mottakere</string>

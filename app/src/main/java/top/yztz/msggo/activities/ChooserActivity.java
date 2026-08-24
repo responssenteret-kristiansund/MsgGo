@@ -274,109 +274,21 @@ public class ChooserActivity extends AppCompatActivity {
             messages.add(new Message(phoneNumber, content));
         }
 
-        // Start sensitive word check process
-        checkAndSendMessages(messages, 0);
-    }
-
-    /**
-     * Recursively check messages for sensitive words and prompt user for action if found.
-     * @param messages The list of messages to send
-     * @param index The current index being checked
-     */
-    private void checkAndSendMessages(List<Message> messages, int index) {
-        // Skip already-null (skipped) messages
-        while (index < messages.size() && messages.get(index) == null) {
-            index++;
-        }
-
-        if (index >= messages.size()) {
-            // All messages checked, filter out nulls and send
-            List<Message> validMessages = new ArrayList<>();
-            for (Message m : messages) {
-                if (m != null) {
-                    validMessages.add(m);
-                }
-            }
-            if (validMessages.isEmpty()) {
-                ToastUtil.show(this, R.string.sending_completed);
-                return;
-            }
-
-            String serPath = FileUtil.saveMessageArrayToFile(this, messages.toArray(new Message[0]));
-            if (TextUtils.isEmpty(serPath)) {
-                ToastUtil.show(this, R.string.unknown_error);
-                return;
-            }
-            Intent intent = new Intent(this, SendingActivity.class);
-            intent.putExtra("to_send", serPath);
-            startActivity(intent);
+        if (messages.isEmpty()) {
+            ToastUtil.show(this, R.string.sending_completed);
             return;
         }
 
-        Message message = messages.get(index);
-        List<String> sensitiveWords = SettingManager.isSensitiveWordFilterEnabled() ?
-                SensitiveWordUtil.findAll(message.getContent()) : Collections.EMPTY_LIST;
-
-        if (sensitiveWords.isEmpty()) {
-            // No sensitive words, proceed to next message
-            checkAndSendMessages(messages, index + 1);
-        } else {
-            // Sensitive words detected, show dialog
-            final int currentIndex = index;
-            String wordsDisplay = TextUtils.join(", ", sensitiveWords);
-
-            new MaterialAlertDialogBuilder(this)
-                    .setTitle(getString(R.string.sensitive_word_detected_title))
-                    .setMessage(getString(R.string.sensitive_word_detected_msg, currentIndex + 1, wordsDisplay))
-                    .setCancelable(false)
-                    .setPositiveButton(getString(R.string.skip_message), (dialog, which) -> {
-                        // Skip this message
-                        messages.set(currentIndex, null);
-                        checkAndSendMessages(messages, currentIndex + 1);
-                    })
-                    .setNeutralButton(getString(R.string.edit_message), (dialog, which) -> {
-                        // Show edit dialog
-                        showEditMessageDialog(messages, currentIndex);
-                    })
-                    .setNegativeButton(getString(R.string.cancel_send), (dialog, which) -> {
-                        // Cancel entire sending process
-                        ToastUtil.show(this, getString(R.string.sending_cancelled));
-                    })
-                    .show();
+        String serPath = FileUtil.saveMessageArrayToFile(this, messages.toArray(new Message[0]));
+        if (TextUtils.isEmpty(serPath)) {
+            ToastUtil.show(this, R.string.unknown_error);
+            return;
         }
+
+        Intent intent = new Intent(this, SendingActivity.class);
+        intent.putExtra("to_send", serPath);
+        startActivity(intent);
     }
-
-    /**
-     * Show a dialog to edit the message content. Re-checks for sensitive words after saving.
-     */
-    private void showEditMessageDialog(List<Message> messages, int index) {
-        Message message = messages.get(index);
-
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_edit_text, null);
-        TextInputLayout container = dialogView.findViewById(R.id.edit_text_container);
-
-        EditText editText = dialogView.findViewById(R.id.edit_text);
-        editText.setText(message.getContent());
-        editText.setSelection(editText.getText().length());
-
-        new MaterialAlertDialogBuilder(this)
-                .setTitle(getString(R.string.edit_message))
-                .setView(dialogView)
-                .setCancelable(false)
-                .setPositiveButton(getString(R.string.save), (dialog, which) -> {
-                    String newContent = editText.getText().toString();
-                    messages.set(index, new Message(message.getPhone(), newContent));
-                    // Re-check this message
-                    checkAndSendMessages(messages, index);
-                })
-                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
-                    // Go back to the check dialog
-                    checkAndSendMessages(messages, index);
-                })
-                .show();
-    }
-
-
 
     @Override
     protected void onDestroy() {

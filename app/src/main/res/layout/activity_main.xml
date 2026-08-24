@@ -44,17 +44,6 @@
                 app:collapsedTitleTextAppearance="@style/TextAppearance.Msggo.DisplaySmall"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
-                <ImageView
-                    android:id="@+id/iv_header_image"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_gravity="end|bottom"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginBottom="0dp"
-                    android:contentDescription="@string/app_name"
-                    app:layout_collapseMode="parallax"
-                    app:layout_collapseParallaxMultiplier="0.7" />
-
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
