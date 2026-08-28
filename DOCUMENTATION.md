@@ -77,7 +77,7 @@ Listens for system intents from the Android Telephony stack to confirm if a mess
 - `PoiSpreadsheetParser`: Uses the Apache POI library for `.xlsx` and `.xls` files.
 - `OdsSpreadsheetParser`: Specifically for OpenDocument spreadsheets.
 
-#### `SensitiveWordUtil`
+#### `SensitiveWordUtil DEPRECATED`
 Uses the `sensitive-word` library to scan message content for restricted terms before sending, helping to avoid carrier blocks.
 
 #### `LocaleUtils`
