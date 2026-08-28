@@ -39,8 +39,7 @@ public class Settings {
     public static final boolean DISCLAIMER_ACCEPTED_DEFAULT = false;
     // language
     public static final String LANGUAGE_DEFAULT = "auto";
-
-    public static final int EXCEL_ROW_COUNT_MAX = 200;
+    public static final int EXCEL_ROW_COUNT_MAX = 1000;
     public static final long EXCEL_FILE_SIZE_MAX = 50 * 1024 * 1024; // 50MB
 
 }
