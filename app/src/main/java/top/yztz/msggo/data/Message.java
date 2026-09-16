@@ -21,12 +21,18 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
     private String phone;
+    private String name;
     private String content;
 
     private MessageState state = MessageState.PENDING;
 
     public Message(String phone, String content) {
+        this(phone, null, content);
+    }
+
+    public Message(String phone, String name, String content) {
         this.phone = phone;
+        this.name = name;
         this.content = content;
     }
 
@@ -36,6 +42,14 @@ public class Message implements Serializable {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getContent() {

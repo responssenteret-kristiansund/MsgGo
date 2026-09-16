@@ -59,6 +59,8 @@
     <string name="send_delay_summary">Delay between each SMS to avoid carrier blocks</string>
     <string name="send_finish_delay">Completion Delay</string>
     <string name="send_finish_delay_summary">Delay before returning to home after completion</string>
+    <string name="listen_timeout">Listen Timeout</string>
+    <string name="listen_timeout_summary">How long to wait for a response after sending</string>
     <string name="randomize_delay">Randomize Delay</string>
     <string name="randomize_delay_summary">Wait a random time (min-current)</string>
     <string name="sms_cost">SMS Rate</string>
@@ -190,4 +192,7 @@
     <string name="sent">Sent</string>
     <string name="failed">Failed</string>
     <string name="paused">Paused</string>
+    <string name="responded">Correct</string>
+    <string name="listening">Listening…</string>
+    <string name="timer_format">Time left: %s</string>
 </resources>

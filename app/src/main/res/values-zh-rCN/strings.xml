@@ -61,6 +61,8 @@
     <string name="send_finish_delay_summary">任务完成后返回主页前的延迟时间</string>
     <string name="randomize_delay">随机化延迟</string>
     <string name="randomize_delay_summary">在最小值与设定值之间取随机延迟</string>
+    <string name="listen_timeout">响应等待时间</string>
+    <string name="listen_timeout_summary">发送完成后等待回复的时长</string>
     <string name="sms_cost">短信资费</string>
     <string name="sms_cost_summary">用于计算发送费用</string>
     <string name="category_storage">存储</string>
@@ -197,5 +199,7 @@
     <string name="currency_sms_rate">￥%1$.2f</string>
     <string name="currency_unit">￥</string>
 
-
+    <string name="responded">已响应</string>
+    <string name="listening">等待响应中…</string>
+    <string name="timer_format">剩余时间: %s</string>
 </resources>

@@ -18,5 +18,5 @@
 package top.yztz.msggo.data;
 
 public enum MessageState {
-    PENDING, WAITING, SUBMITTED, SENT, FAILED, PAUSED
+    PENDING, WAITING, SUBMITTED, SENT, FAILED, PAUSED, RESPONDED
 }

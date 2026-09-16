@@ -68,6 +68,13 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull List<Object> payloads) {
         Message message = messages.get(position);
 
+        if (message.getName() != null && !message.getName().isEmpty()) {
+            holder.tvName.setVisibility(View.VISIBLE);
+            holder.tvName.setText(message.getName());
+        } else {
+            holder.tvName.setVisibility(View.GONE);
+        }
+
         holder.tvPhone.setText(message.getPhone());
         holder.tvContent.setText(message.getContent().replace('\n', ' '));
         if (payloads.isEmpty()) {
@@ -82,6 +89,13 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Message message = messages.get(position);
 
+        if (message.getName() != null && !message.getName().isEmpty()) {
+            holder.tvName.setVisibility(View.VISIBLE);
+            holder.tvName.setText(message.getName());
+        } else {
+            holder.tvName.setVisibility(View.GONE);
+        }
+
         holder.tvPhone.setText(message.getPhone());
         holder.tvContent.setText(message.getContent().replace('\n', ' '));
         holder.transitionToState(message.getState(), false); // false = 不使用动画
@@ -94,7 +108,7 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         MaterialCardView cardView;
-        TextView tvPhone, tvContent, tvStatus;
+        TextView tvPhone, tvContent, tvStatus, tvName;
         ImageView ivStatusIcon;
         LinearProgressIndicator progressIndicator;
 
@@ -105,6 +119,7 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             cardView = (MaterialCardView) itemView;
+            tvName = itemView.findViewById(R.id.tv_name);
             tvPhone = itemView.findViewById(R.id.tv_phone);
             tvContent = itemView.findViewById(R.id.tv_content);
             tvStatus = itemView.findViewById(R.id.tv_status);
@@ -117,6 +132,10 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
             int onBgOk   = MaterialColors.getColor(itemView, R.attr.colorOnPrimaryContainer);
             int bgErr    = MaterialColors.getColor(itemView, R.attr.colorErrorContainer);
             int onBgErr  = MaterialColors.getColor(itemView, R.attr.colorOnErrorContainer);
+            
+            // New Responded colors (Success/Secondary color)
+            int bgResponded = MaterialColors.getColor(itemView, com.google.android.material.R.attr.colorTertiaryContainer);
+            int onBgResponded = MaterialColors.getColor(itemView, com.google.android.material.R.attr.colorOnTertiaryContainer);
 
             styleMap.put(MessageState.PENDING,   new StateStyle(bg,    onBg,    R.drawable.ic_hourglass, R.string.pending,   1f,   false));
             styleMap.put(MessageState.WAITING,   new StateStyle(bg,    onBg,    R.drawable.ic_hourglass, R.string.waiting,   1f,   true));
@@ -124,6 +143,7 @@ public class SendingListAdapter extends RecyclerView.Adapter<SendingListAdapter.
             styleMap.put(MessageState.PAUSED,    new StateStyle(bg,    onBg,    R.drawable.ic_pause,     R.string.paused,    0.6f, false));
             styleMap.put(MessageState.SENT,      new StateStyle(bgOk,  onBgOk,  R.drawable.ic_success,   R.string.sent,      1f,   false));
             styleMap.put(MessageState.FAILED,    new StateStyle(bgErr, onBgErr, R.drawable.ic_error,     R.string.failed,    1f,   false));
+            styleMap.put(MessageState.RESPONDED, new StateStyle(bgResponded, onBgResponded, R.drawable.ic_check_circle, R.string.responded, 1f, false));
         }
 
         private StateStyle getStyleForState(MessageState state) {

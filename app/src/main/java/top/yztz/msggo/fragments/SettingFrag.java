@@ -66,11 +66,12 @@ public class SettingFrag extends Fragment {
     private MaterialSwitch mSwitchAutoEditor, mSwitchRandomizeDelay;
     private MaterialCardView mCardClearCache;
     private View mRowExportLog, mRowAboutApp, mRowLanguage, mRowCheckUpdate, mRowDarkMode;
-    private TextView mTvCache, mTvDelayValue, mTvFinishDelayValue, mTvSmsRateValue, mTvLanguage, mTvDarkModeSummary;
+    private TextView mTvCache, mTvDelayValue, mTvFinishDelayValue, mTvListenTimeoutValue, mTvSmsRateValue, mTvLanguage, mTvDarkModeSummary;
     private LinearLayout mCardSmsRate;
     private boolean isUpdatingUI = false;
     private Slider mSliderDelay;
     private Slider mSliderFinishDelay;
+    private Slider mSliderListenTimeout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,6 +117,12 @@ public class SettingFrag extends Fragment {
         mSliderFinishDelay.setValueTo(Settings.SEND_FINISH_DELAY_MAX);
         mSliderFinishDelay.setStepSize(Settings.SEND_FINISH_DELAY_STEP_UNIT);
 
+        mTvListenTimeoutValue = view.findViewById(R.id.tv_listen_timeout_value);
+        mSliderListenTimeout = view.findViewById(R.id.slider_listen_timeout);
+        mSliderListenTimeout.setValueFrom(Settings.LISTEN_TIMEOUT_MIN);
+        mSliderListenTimeout.setValueTo(Settings.LISTEN_TIMEOUT_MAX);
+        mSliderListenTimeout.setStepSize(1.0f);
+
         setupListeners();
         showInfo();
     }
@@ -145,6 +152,15 @@ public class SettingFrag extends Fragment {
             float seconds = value / 1000f;
             return String.format(Locale.getDefault(), "%.1fs", seconds);
         });
+
+        mSliderListenTimeout.addOnChangeListener((slider, value, fromUser) -> {
+            if (fromUser) {
+                SettingManager.setListenTimeout((int) value);
+                mTvListenTimeoutValue.setText(String.format(Locale.getDefault(), "%dm", (int) value));
+            }
+        });
+
+        mSliderListenTimeout.setLabelFormatter(value -> String.format(Locale.getDefault(), "%dm", (int) value));
 
         // Auto-save: Slider Delay
         mSliderDelay.addOnChangeListener((slider, value, fromUser) -> {
@@ -349,6 +365,10 @@ public class SettingFrag extends Fragment {
         float finishDelay = SettingManager.getFinishDelay();
         mSliderFinishDelay.setValue(finishDelay);
         mTvFinishDelayValue.setText(String.format(Locale.getDefault(), "%.1fs", finishDelay / 1000f));
+
+        int listenTimeout = SettingManager.getListenTimeout();
+        mSliderListenTimeout.setValue(listenTimeout);
+        mTvListenTimeoutValue.setText(String.format(Locale.getDefault(), "%dm", listenTimeout));
 
         // Set switches
         mSwitchAutoEditor.setChecked(SettingManager.autoEnterEditor());

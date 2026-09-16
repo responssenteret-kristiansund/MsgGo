@@ -27,7 +27,10 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.content.IntentFilter;
+import android.os.CountDownTimer;
 import android.widget.TextView;
+import top.yztz.msggo.services.SMSResponseReceiver;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
@@ -59,7 +62,7 @@ public class SendingActivity extends AppCompatActivity implements MessageService
     private RecyclerView rvList;
     private SendingListAdapter adapter;
     private MaterialToolbar topAppBar;
-    private TextView tvSubmittedCount, tvConfirmedCount;
+    private TextView tvSubmittedCount, tvConfirmedCount, tvTimer;
     private LinearProgressIndicator progressSubmitted, progressConfirmed;
 
     // Data
@@ -67,10 +70,15 @@ public class SendingActivity extends AppCompatActivity implements MessageService
     private int subId;
     private int delay;
     private boolean randomize;
+    private int listenTimeoutMinutes;
 
     // Service
     private MessageService service = null;
     private boolean isBound = false;
+
+    // Response Listener
+    private SMSResponseReceiver responseReceiver;
+    private CountDownTimer countDownTimer;
 
     // Sending state
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -80,7 +88,7 @@ public class SendingActivity extends AppCompatActivity implements MessageService
     private boolean isStopped = false;
 
     public enum SendingState {
-        IDLE, SENDING, PAUSED, COMPLETED, CANCELLED
+        IDLE, SENDING, PAUSED, LISTENING, COMPLETED, CANCELLED
     }
 
     private SendingState currentState = SendingState.IDLE;
@@ -158,6 +166,7 @@ public class SendingActivity extends AppCompatActivity implements MessageService
         rvList = findViewById(R.id.rv_sending_list);
         tvSubmittedCount = findViewById(R.id.tv_sent_count);
         tvConfirmedCount = findViewById(R.id.tv_confirmed_count);
+        tvTimer = findViewById(R.id.tv_timer);
         progressSubmitted = findViewById(R.id.progress_sent);
         progressConfirmed = findViewById(R.id.progress_confirmed);
 
@@ -264,31 +273,103 @@ public class SendingActivity extends AppCompatActivity implements MessageService
     private void checkCompletion() {
         if (currentIndex >= messages.size()) {
             if (confirmedCount >= messages.size()) {
-                currentState = SendingState.COMPLETED;
-                if (isBound) {
-                    service.finishSession(true);
+                if (currentState != SendingState.LISTENING) {
+                    startListeningMode();
                 }
-                updateUI();
-                Log.i(TAG, "All messages sent and confirmed!");
-
-                // Returns to home page after all sending is complete
-                long completionDelay = SettingManager.getFinishDelay();
-                handler.postDelayed(this::navigateToHome, completionDelay);
             } else {
                 // All submitted, but waiting for confirmations.
-                // We update the UI to show we are done with sending, but still waiting for reports.
                 updateUI();
                 
-                // If it takes too long (e.g. 10s after all submitted), just auto-finish
+                // If it takes too long (e.g. 10s after all submitted), just start listening anyway
                 handler.postDelayed(() -> {
                     if (currentState == SendingState.SENDING && currentIndex >= messages.size()) {
-                        Log.w(TAG, "Completion timeout reached. Finishing anyway.");
-                        confirmedCount = messages.size(); 
-                        checkCompletion();
+                        Log.w(TAG, "Confirmation timeout. Starting listening anyway.");
+                        startListeningMode();
                     }
-                }, Settings.SEND_FINISH_DELAY_DEFAULT);
+                }, 10000L);
             }
         }
+    }
+
+    private void startListeningMode() {
+        currentState = SendingState.LISTENING;
+        updateUI();
+        
+        if (isBound) {
+            service.finishSession(true);
+        }
+
+        // Initialize Response Receiver
+        responseReceiver = new SMSResponseReceiver(this::handleIncomingSMS);
+        IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
+        registerReceiver(responseReceiver, filter);
+
+        // Start Timer
+        int minutes = SettingManager.getListenTimeout();
+        tvTimer.setVisibility(android.view.View.VISIBLE);
+        
+        countDownTimer = new CountDownTimer(minutes * 60 * 1000L, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                long totalSeconds = millisUntilFinished / 1000;
+                long m = totalSeconds / 60;
+                long s = totalSeconds % 60;
+                tvTimer.setText(getString(R.string.timer_format, String.format(Locale.getDefault(), "%02d:%02d", m, s)));
+            }
+
+            @Override
+            public void onFinish() {
+                finishSessionCompletely();
+            }
+        }.start();
+        
+        Log.i(TAG, "Entering Listening Mode for " + minutes + " minutes");
+    }
+
+    private void handleIncomingSMS(String sender) {
+        if (sender == null || messages == null) return;
+        
+        // Normalize sender: remove everything except digits
+        String normalizedSender = sender.replaceAll("\\D", "");
+        
+        runOnUiThread(() -> {
+            boolean found = false;
+            for (int i = 0; i < messages.size(); i++) {
+                Message msg = messages.get(i);
+                if (msg.getState() == MessageState.RESPONDED) continue;
+                
+                String normalizedMsgPhone = msg.getPhone().replaceAll("\\D", "");
+                
+                // Match: check if one contains the other (handling prefix differences like +47)
+                if (normalizedSender.endsWith(normalizedMsgPhone) || normalizedMsgPhone.endsWith(normalizedSender)) {
+                    updateMessageState(i, MessageState.RESPONDED);
+                    found = true;
+                }
+            }
+            if (found) {
+                Log.d(TAG, "Matched response from " + sender);
+            }
+        });
+    }
+
+    private void finishSessionCompletely() {
+        if (currentState == SendingState.COMPLETED) return;
+        
+        currentState = SendingState.COMPLETED;
+        updateUI();
+        
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+        
+        if (responseReceiver != null) {
+            try {
+                unregisterReceiver(responseReceiver);
+            } catch (Exception ignored) {}
+        }
+
+        long completionDelay = SettingManager.getFinishDelay();
+        handler.postDelayed(this::navigateToHome, completionDelay);
     }
 
     // --- Callbacks from MessageService ---
@@ -340,6 +421,10 @@ public class SendingActivity extends AppCompatActivity implements MessageService
             case PAUSED:
                 topAppBar.setTitle(R.string.paused);
                 updateMenuIcon(false);
+                break;
+            case LISTENING:
+                topAppBar.setTitle(R.string.listening);
+                updateMenuIcon(true);
                 break;
             case COMPLETED:
                 topAppBar.setTitle(R.string.done);
@@ -405,6 +490,17 @@ public class SendingActivity extends AppCompatActivity implements MessageService
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacksAndMessages(null);
+        
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+        
+        if (responseReceiver != null) {
+            try {
+                unregisterReceiver(responseReceiver);
+            } catch (Exception ignored) {}
+        }
+        
         if (isBound) {
             stopSending();
         }

@@ -64,8 +64,21 @@ public class EditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        
         mEt = findViewById(R.id.et_editor);
+        
+        // Handle keyboard and bottom bar insets
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.scroll_view), (v, insets) -> {
+            int imeHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom;
+            int navigationBarsHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.navigationBars()).bottom;
+            
+            // Add padding to ensure the cursor is always above the keyboard + bottom bar
+            // 100dp is roughly the height of the BottomAppBar + FAB
+            int bottomPadding = (int) (120 * getResources().getDisplayMetrics().density);
+            v.setPadding(0, 0, 0, Math.max(imeHeight, bottomPadding) + (imeHeight > 0 ? 16 : 0));
+            
+            return insets;
+        });
 //        mEt.setLineSpacing(0, 1.4f); // Fixed line height for stability
         mBtnSave = findViewById(R.id.btn_save);
         mBtnSave.setOnClickListener(v->{

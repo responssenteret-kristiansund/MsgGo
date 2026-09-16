@@ -273,6 +273,7 @@ public class MainActivity extends AppCompatActivity implements HomeFrag.DataLoad
         List<String> permissions = new ArrayList<>();
         permissions.add(Manifest.permission.READ_PHONE_STATE);
         permissions.add(Manifest.permission.SEND_SMS);
+        permissions.add(Manifest.permission.RECEIVE_SMS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) permissions.add(Manifest.permission.FOREGROUND_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) permissions.add(Manifest.permission.POST_NOTIFICATIONS);
 

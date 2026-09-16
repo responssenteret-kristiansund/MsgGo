@@ -29,6 +29,12 @@ public class Settings {
     public static final long SEND_FINISH_DELAY_MAX = 60000L;
     public static final int SEND_FINISH_DELAY_STEP_UNIT = 1000;
     public static final int SEND_DELAY_STEP_UNIT = 500;
+    
+    // Response Listening Timeout (minutes)
+    public static final int LISTEN_TIMEOUT_DEFAULT = 10;
+    public static final int LISTEN_TIMEOUT_MIN = 1;
+    public static final int LISTEN_TIMEOUT_MAX = 30;
+
     public static final boolean SEND_DELAY_RANDOMIZATION_DEFAULT = true;
     // SMS rate
     public static final float SMS_RATE_DEFAULT = 0.1f;

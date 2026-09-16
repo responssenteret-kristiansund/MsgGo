@@ -266,12 +266,26 @@ public class ChooserActivity extends AppCompatActivity {
         String rawContent = DataModel.getTemplate();
         String numberCol = DataModel.getNumberColumn();
 
+        // Try to find a Name column automatically
+        String nameCol = null;
+        String[] titles = DataModel.getTitles();
+        if (titles != null) {
+            for (String t : titles) {
+                String tl = t.toLowerCase(Locale.ROOT);
+                if (tl.equals("name") || tl.equals("navn") || tl.equals("姓名")) {
+                    nameCol = t;
+                    break;
+                }
+            }
+        }
+
         List<Message> messages = new ArrayList<>();
         for (int i : itemIndices) {
             Map<String, String> tmp = DataModel.getRow(i);
             String content = TextParser.parse(rawContent, tmp);
             String phoneNumber = tmp.get(numberCol);
-            messages.add(new Message(phoneNumber, content));
+            String name = (nameCol != null) ? tmp.get(nameCol) : null;
+            messages.add(new Message(phoneNumber, name, content));
         }
 
         if (messages.isEmpty()) {

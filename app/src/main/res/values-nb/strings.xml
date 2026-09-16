@@ -60,6 +60,8 @@
     <string name="send_delay_summary">Forsinkelse mellom hver SMS for å unngå blokkering fra operatør</string>
     <string name="send_finish_delay">Forsinkelse ved fullføring</string>
     <string name="send_finish_delay_summary">Forsinkelse før retur til hjem-skjerm etter fullføring</string>
+    <string name="listen_timeout">Lytte-tidsavbrudd</string>
+    <string name="listen_timeout_summary">Hvor lenge appen skal vente på svar etter sending</string>
     <string name="randomize_delay">Tilfeldig forsinkelse</string>
     <string name="randomize_delay_summary">Vent i et tilfeldig tidsintervall</string>
     <string name="sms_cost">SMS-takst</string>
@@ -191,4 +193,7 @@
     <string name="sent">Sendt</string>
     <string name="failed">Feilet</string>
     <string name="paused">Pauset</string>
+    <string name="responded">Korrekt</string>
+    <string name="listening">Lytter…</string>
+    <string name="timer_format">Tid igjen: %s</string>
 </resources>

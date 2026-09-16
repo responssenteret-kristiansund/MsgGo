@@ -18,20 +18,24 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="100dp"
-        android:clipToPadding="false"
+        android:fillViewport="true"
         android:isScrollContainer="true">
 
         <EditText
             android:id="@+id/et_editor"
             android:paddingHorizontal="18dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="120dp"
+            android:gravity="top"
             android:inputType="textMultiLine"
             android:textSize="22sp"
             android:lineSpacingMultiplier="1.3"

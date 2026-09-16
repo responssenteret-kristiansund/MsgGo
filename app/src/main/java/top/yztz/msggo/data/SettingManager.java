@@ -41,6 +41,7 @@ public class SettingManager {
     private static final String PRIVACY_ACCEPTED_KEY = "privacy_accepted";
     private static final String DISCLAIMER_ACCEPTED_KEY = "disclaimer_accepted";
     private static final String DARK_MODE_KEY = "dark_mode_v1";
+    private static final String LISTEN_TIMEOUT_KEY = "listen_timeout_v1";
     private static final String SENSITIVE_WORD_FILTER_KEY = "sensitive_word_filter_v1";
 
     /** 深色模式值常量：跟随系统 */
@@ -62,6 +63,7 @@ public class SettingManager {
         DefaultPropMap.put(DISCLAIMER_ACCEPTED_KEY, Settings.DISCLAIMER_ACCEPTED_DEFAULT);
         DefaultPropMap.put(DARK_MODE_KEY, DARK_MODE_SYSTEM);
         DefaultPropMap.put(SEND_FINISH_KEY, Settings.SEND_FINISH_DELAY_DEFAULT);
+        DefaultPropMap.put(LISTEN_TIMEOUT_KEY, Settings.LISTEN_TIMEOUT_DEFAULT);
         DefaultPropMap.put(SENSITIVE_WORD_FILTER_KEY, true);
     }
 
@@ -106,6 +108,14 @@ public class SettingManager {
     public static void setFinishDelay(long num) {
         mEditor.putLong(SEND_FINISH_KEY, num);
         mEditor.apply();
+    }
+
+    public static int getListenTimeout() {
+        return mSp.getInt(LISTEN_TIMEOUT_KEY, Settings.LISTEN_TIMEOUT_DEFAULT);
+    }
+
+    public static void setListenTimeout(int minutes) {
+        mEditor.putInt(LISTEN_TIMEOUT_KEY, minutes).apply();
     }
 
     public static long getFinishDelay() {
