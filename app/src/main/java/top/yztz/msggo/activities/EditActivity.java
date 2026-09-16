@@ -68,19 +68,19 @@ public class EditActivity extends AppCompatActivity {
         
         mEt = findViewById(R.id.et_editor);
         
-        // Use a dynamic padding approach to ensure the cursor stays visible above the bottom bar
+        // Ensure the EditText content has enough bottom padding to not be covered by the BottomAppBar
+        // The system handles the keyboard (ime) height automatically due to adjustResize + fitsSystemWindows
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.scroll_view), (v, insets) -> {
-            int imeHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom;
             int navHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.navigationBars()).bottom;
             
-            // Adjust the inner layout padding to account for the keyboard
-            // We keep a baseline padding of 120dp for the BottomAppBar
             float density = getResources().getDisplayMetrics().density;
-            int bottomAppBarHeight = (int) (100 * density);
+            int bottomAppBarHeight = (int) (100 * density); // Height of the bar + FAB
             
             View content = ((androidx.core.widget.NestedScrollView) v).getChildAt(0);
             if (content != null) {
-                content.setPadding(0, 0, 0, Math.max(bottomAppBarHeight, imeHeight - navHeight + 16));
+                // We only need to account for the BottomAppBar height. 
+                // The system resizes the whole window for the keyboard.
+                content.setPadding(0, 0, 0, bottomAppBarHeight + navHeight);
             }
             
             return insets;
