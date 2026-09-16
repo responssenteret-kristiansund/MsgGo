@@ -67,24 +67,6 @@ public class EditActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit);
         
         mEt = findViewById(R.id.et_editor);
-        
-        // Ensure the EditText content has enough bottom padding to not be covered by the BottomAppBar
-        // The system handles the keyboard (ime) height automatically due to adjustResize + fitsSystemWindows
-        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.scroll_view), (v, insets) -> {
-            int navHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.navigationBars()).bottom;
-            
-            float density = getResources().getDisplayMetrics().density;
-            int bottomAppBarHeight = (int) (100 * density); // Height of the bar + FAB
-            
-            View content = ((androidx.core.widget.NestedScrollView) v).getChildAt(0);
-            if (content != null) {
-                // We only need to account for the BottomAppBar height. 
-                // The system resizes the whole window for the keyboard.
-                content.setPadding(0, 0, 0, bottomAppBarHeight + navHeight);
-            }
-            
-            return insets;
-        });
 //        mEt.setLineSpacing(0, 1.4f); // Fixed line height for stability
         mBtnSave = findViewById(R.id.btn_save);
         mBtnSave.setOnClickListener(v->{
