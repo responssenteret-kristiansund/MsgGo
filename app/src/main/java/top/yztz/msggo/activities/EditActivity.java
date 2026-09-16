@@ -64,9 +64,33 @@ public class EditActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // This is key: we want to draw under the system bars, but handle the keyboard ourselves
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_edit);
         
         mEt = findViewById(R.id.et_editor);
+        
+        // Use a dynamic padding approach to ensure the cursor stays visible above the bottom bar
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.drawer_layout), (v, insets) -> {
+            int imeHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom;
+            int navHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.navigationBars()).bottom;
+            int statusBarHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.statusBars()).top;
+
+            // Move the BottomAppBar up by the keyboard height
+            mBottomAppBar.setTranslationY(-imeHeight + navHeight);
+            mBtnSave.setTranslationY(-imeHeight + navHeight);
+
+            // Add top padding to account for the status bar since we disabled DecorFitsSystemWindows
+            v.setPadding(0, statusBarHeight, 0, 0);
+
+            // Give the ScrollView enough bottom padding so the text can clear the floating BottomAppBar
+            // and the keyboard simultaneously.
+            float density = getResources().getDisplayMetrics().density;
+            int bottomAppBarTotalHeight = (int) (100 * density); 
+            findViewById(R.id.scroll_view).setPadding(0, 0, 0, Math.max(imeHeight, bottomAppBarTotalHeight));
+
+            return insets;
+        });
 //        mEt.setLineSpacing(0, 1.4f); // Fixed line height for stability
         mBtnSave = findViewById(R.id.btn_save);
         mBtnSave.setOnClickListener(v->{
