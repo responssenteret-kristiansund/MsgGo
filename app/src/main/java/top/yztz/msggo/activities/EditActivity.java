@@ -36,6 +36,7 @@ import android.text.Editable;
 import android.text.Spannable;
 import android.text.TextWatcher;
 import android.text.style.ReplacementSpan;
+import android.view.View;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
@@ -67,15 +68,20 @@ public class EditActivity extends AppCompatActivity {
         
         mEt = findViewById(R.id.et_editor);
         
-        // Handle keyboard and bottom bar insets
+        // Use a dynamic padding approach to ensure the cursor stays visible above the bottom bar
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.scroll_view), (v, insets) -> {
             int imeHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom;
-            int navigationBarsHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.navigationBars()).bottom;
+            int navHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.navigationBars()).bottom;
             
-            // Add padding to ensure the cursor is always above the keyboard + bottom bar
-            // 100dp is roughly the height of the BottomAppBar + FAB
-            int bottomPadding = (int) (120 * getResources().getDisplayMetrics().density);
-            v.setPadding(0, 0, 0, Math.max(imeHeight, bottomPadding) + (imeHeight > 0 ? 16 : 0));
+            // Adjust the inner layout padding to account for the keyboard
+            // We keep a baseline padding of 120dp for the BottomAppBar
+            float density = getResources().getDisplayMetrics().density;
+            int bottomAppBarHeight = (int) (100 * density);
+            
+            View content = ((androidx.core.widget.NestedScrollView) v).getChildAt(0);
+            if (content != null) {
+                content.setPadding(0, 0, 0, Math.max(bottomAppBarHeight, imeHeight - navHeight + 16));
+            }
             
             return insets;
         });
