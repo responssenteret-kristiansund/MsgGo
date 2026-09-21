@@ -26,25 +26,24 @@
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_dodgeInsetEdges="bottom"
         android:fillViewport="true"
         android:scrollbars="vertical"
         android:fadeScrollbars="false"
         android:requiresFadingEdge="vertical"
         android:fadingEdgeLength="30dp"
+        android:overScrollMode="always"
         android:isScrollContainer="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="100dp"
-            android:clipToPadding="false">
+            android:orientation="vertical">
 
             <EditText
                 android:id="@+id/et_editor"
                 android:paddingHorizontal="18dp"
                 android:paddingTop="16dp"
+                android:paddingBottom="600dp"
                 android:gravity="top"
                 android:inputType="textMultiLine"
                 android:textSize="22sp"
