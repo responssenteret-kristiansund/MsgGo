@@ -192,7 +192,7 @@
     <string name="sent">Sent</string>
     <string name="failed">Failed</string>
     <string name="paused">Paused</string>
-    <string name="responded">Correct</string>
+    <string name="responded">Responded</string>
     <string name="listening">Listening…</string>
     <string name="timer_format">Time left: %s</string>
 </resources>

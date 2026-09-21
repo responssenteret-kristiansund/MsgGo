@@ -193,7 +193,7 @@
     <string name="sent">Sendt</string>
     <string name="failed">Feilet</string>
     <string name="paused">Pauset</string>
-    <string name="responded">Korrekt</string>
+    <string name="responded">Besvart</string>
     <string name="listening">Lytter…</string>
     <string name="timer_format">Tid igjen: %s</string>
 </resources>
