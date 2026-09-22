@@ -61,6 +61,7 @@ public class MessageService extends Service {
     
     private int totalMessages = 0;
     private int submittedCount = 0;
+    private volatile boolean isSessionActive = false;
 
     public class LocalBinder extends Binder {
         public MessageService getService() {
@@ -110,8 +111,13 @@ public class MessageService extends Service {
     public void initSession(int total) {
         this.totalMessages = total;
         this.submittedCount = 0;
+        this.isSessionActive = true;
         startForeground(NOTIFICATION_ID, notificationBuilder.build());
         Log.i(TAG, "Session initialized. Total messages: " + total);
+    }
+
+    public boolean isSessionActive() {
+        return isSessionActive;
     }
 
     /**
@@ -146,6 +152,7 @@ public class MessageService extends Service {
      * Complete the sending session.
      */
     public void finishSession(boolean completed) {
+        isSessionActive = false;
         if (completed) {
             showCompletedNotification();
             stopForeground(STOP_FOREGROUND_DETACH);

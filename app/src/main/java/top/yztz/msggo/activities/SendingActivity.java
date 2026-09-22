@@ -114,10 +114,45 @@ public class SendingActivity extends AppCompatActivity implements MessageService
         }
     };
 
+    private static List<Message> activeMessages;
+    private static int activeSubId;
+    private static int activeDelay;
+    private static boolean activeRandomize;
+    private static int activeCurrentIndex;
+    private static int activeConfirmedCount;
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        Log.d(TAG, "onNewIntent: Sending session already active");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
+        
+        // Handle Activity re-entry or recreation
+        if (activeMessages != null) {
+            messages = activeMessages;
+            subId = activeSubId;
+            delay = activeDelay;
+            randomize = activeRandomize;
+            currentIndex = activeCurrentIndex;
+            confirmedCount = activeConfirmedCount;
+            
+            setContentView(R.layout.activity_sending);
+            initViews();
+            setupList();
+            updateUI();
+            
+            // Re-bind to service to get updates
+            Intent intent = new Intent(this, MessageService.class);
+            bindService(intent, connection, Context.BIND_AUTO_CREATE);
+            return;
+        }
+
         setContentView(R.layout.activity_sending);
 
         // Load messages from serialized file
@@ -197,6 +232,23 @@ public class SendingActivity extends AppCompatActivity implements MessageService
 
     private void startSending() {
         currentState = SendingState.SENDING;
+        
+        // Store in static fields for persistence during this process life
+        activeMessages = messages;
+        activeSubId = subId;
+        activeDelay = delay;
+        activeRandomize = randomize;
+        activeCurrentIndex = currentIndex;
+        activeConfirmedCount = confirmedCount;
+
+        // Start listening for responses immediately
+        if (responseReceiver == null) {
+            responseReceiver = new SMSResponseReceiver(this::handleIncomingSMS);
+            IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
+            registerReceiver(responseReceiver, filter);
+            Log.d(TAG, "Response receiver registered at start of sending");
+        }
+        
         updateUI();
         sendNextMessage();
     }
@@ -262,6 +314,21 @@ public class SendingActivity extends AppCompatActivity implements MessageService
         isStopped = true;
         handler.removeCallbacksAndMessages(null);
         currentState = SendingState.CANCELLED;
+        
+        // Clear active session cache
+        activeMessages = null;
+
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+
+        if (responseReceiver != null) {
+            try {
+                unregisterReceiver(responseReceiver);
+            } catch (Exception ignored) {}
+            responseReceiver = null;
+        }
+
         if (isBound) {
             service.finishSession(false);
             unbindService(connection);
@@ -298,11 +365,6 @@ public class SendingActivity extends AppCompatActivity implements MessageService
         if (isBound) {
             service.finishSession(true);
         }
-
-        // Initialize Response Receiver
-        responseReceiver = new SMSResponseReceiver(this::handleIncomingSMS);
-        IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
-        registerReceiver(responseReceiver, filter);
 
         // Start Timer
         int minutes = SettingManager.getListenTimeout();
@@ -358,6 +420,9 @@ public class SendingActivity extends AppCompatActivity implements MessageService
         currentState = SendingState.COMPLETED;
         updateUI();
         
+        // Clear active session cache
+        activeMessages = null;
+
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
@@ -380,6 +445,11 @@ public class SendingActivity extends AppCompatActivity implements MessageService
             updateMessageState(index, MessageState.SUBMITTED);
             updateProgress(index + 1, messages.size(), tvSubmittedCount, progressSubmitted);
             currentIndex++;
+            activeCurrentIndex = currentIndex;
+            
+            // Auto-scroll to the current message
+            rvList.smoothScrollToPosition(currentIndex);
+            
             sendNextMessage();
         });
     }
@@ -389,6 +459,7 @@ public class SendingActivity extends AppCompatActivity implements MessageService
         runOnUiThread(() -> {
             updateMessageState(index, success ? MessageState.SENT : MessageState.FAILED);
             confirmedCount++;
+            activeConfirmedCount = confirmedCount;
             updateProgress(confirmedCount, messages.size(), tvConfirmedCount, progressConfirmed);
             checkCompletion();
         });

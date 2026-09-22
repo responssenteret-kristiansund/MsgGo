@@ -297,6 +297,7 @@
                 android:background="?attr/selectableItemBackground">
 
                 <ImageView
+                    android:id="@+id/iv_send_icon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_send_large"
@@ -309,6 +310,7 @@
                     android:layout_marginStart="16dp"
                     android:orientation="vertical">
                     <TextView
+                        android:id="@+id/tv_send_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/send_sms"

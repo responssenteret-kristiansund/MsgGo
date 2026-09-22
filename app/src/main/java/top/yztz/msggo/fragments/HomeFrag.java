@@ -46,6 +46,16 @@ import androidx.transition.Fade;
 import androidx.transition.ChangeBounds;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 
+import android.content.ComponentName;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import top.yztz.msggo.services.MessageService;
+import android.content.ComponentName;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.widget.ImageView;
+import top.yztz.msggo.services.MessageService;
+import top.yztz.msggo.activities.SendingActivity;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,6 +85,25 @@ public class HomeFrag extends Fragment {
     private HistoryAdapter historyAdapter;
 
     private List<SubscriptionInfo> subs;
+    private MessageService messageService;
+    private boolean isBound = false;
+
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MessageService.LocalBinder binder = (MessageService.LocalBinder) service;
+            messageService = binder.getService();
+            isBound = true;
+            updateStatus();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isBound = false;
+            messageService = null;
+            updateStatus();
+        }
+    };
 //    private int simSubId;
 
     public interface DataLoader {
@@ -127,6 +156,19 @@ public class HomeFrag extends Fragment {
     public void onResume() {
         super.onResume();
         updateStatus();
+        loadHistory();
+        
+        Intent intent = new Intent(context, MessageService.class);
+        context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (isBound) {
+            context.unbindService(serviceConnection);
+            isBound = false;
+        }
     }
 
     @Override
@@ -163,7 +205,11 @@ public class HomeFrag extends Fragment {
     private void setupClickListeners() {
         // Send button
         rowSend.setOnClickListener(v -> {
-            if (!DataModel.loaded()) {
+            if (messageService != null && messageService.isSessionActive()) {
+                Intent intent = new Intent(context, SendingActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            } else if (!DataModel.loaded()) {
                 ToastUtil.show(context, getString(R.string.error_load_data_first));
             } else if (TextUtils.isEmpty(DataModel.getTemplate())) {
                 ToastUtil.show(context, getString(R.string.error_edit_content_first));
@@ -330,7 +376,20 @@ public class HomeFrag extends Fragment {
             rowSelectSim.setVisibility(View.VISIBLE);
             cardSend.setVisibility(View.VISIBLE);
             updateSimDisplay();
-//            tvSubtitleSend.setText(getString(R.string.data_ready_format, DataModel.getRowCount()));
+            
+            TextView tvMainTitle = cardSend.findViewById(R.id.tv_send_title);
+            TextView tvSubTitle = cardSend.findViewById(R.id.tv_subtitle_send);
+            ImageView ivSendIcon = cardSend.findViewById(R.id.iv_send_icon);
+
+            if (messageService != null && messageService.isSessionActive()) {
+                tvMainTitle.setText(R.string.listening);
+                tvSubTitle.setText(getString(R.string.tip_sms_preview));
+                ivSendIcon.setImageResource(R.drawable.ic_check_circle);
+            } else {
+                tvMainTitle.setText(R.string.send_sms);
+                tvSubTitle.setText(R.string.data_ready_format);
+                ivSendIcon.setImageResource(R.drawable.ic_send_large);
+            }
         } else {
             cardSend.setVisibility(View.GONE);
             rowSelectSim.setVisibility(View.GONE);

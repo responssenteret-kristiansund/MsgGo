@@ -63,11 +63,20 @@ public class HistoryManager {
 
         List<HistoryItem> list = getHistory(context);
         
-        // Remove existing item to move to top
+        // Remove existing item to move to top, and also remove entries for files that no longer exist
         for (int i = 0; i < list.size(); i++) {
-            if (path.equals(list.get(i).path)) {
+            HistoryItem item = list.get(i);
+            if (path.equals(item.path)) {
                 list.remove(i);
-                break;
+                i--;
+                continue;
+            }
+            
+            // Cleanup: remove history if the physical file is gone
+            File file = new File(item.path);
+            if (!file.exists()) {
+                list.remove(i);
+                i--;
             }
         }
         
