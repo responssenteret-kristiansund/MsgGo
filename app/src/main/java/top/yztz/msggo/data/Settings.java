@@ -25,8 +25,8 @@ public class Settings {
     public static final int SEND_DELAY_MIN = 1000;
     public static final int SEND_DELAY_MAX = 20000;
     public static final long SEND_FINISH_DELAY_DEFAULT = 100000L;
-    public static final long SEND_FINISH_DELAY_MIN = 10000L;
-    public static final long SEND_FINISH_DELAY_MAX = 600000L;
+    public static final long SEND_FINISH_DELAY_MIN = 60000L;
+    public static final long SEND_FINISH_DELAY_MAX = 900000L;
     public static final int SEND_FINISH_DELAY_STEP_UNIT = 1000;
     public static final int SEND_DELAY_STEP_UNIT = 500;
     

@@ -143,14 +143,9 @@ public class SettingFrag extends Fragment {
         mSliderFinishDelay.addOnChangeListener((slider, value, fromUser) -> {
             if (fromUser) {
                 SettingManager.setFinishDelay((long) value);
-                float seconds = value / 1000f;
-                mTvFinishDelayValue.setText(String.format(Locale.getDefault(), "%.1fs", seconds));
+                float minutes = value / 60000f;
+                mTvFinishDelayValue.setText(String.format(Locale.getDefault(), "%.1fm", minutes));
             }
-        });
-
-        mSliderFinishDelay.setLabelFormatter(value -> {
-            float seconds = value / 1000f;
-            return String.format(Locale.getDefault(), "%.1fs", seconds);
         });
 
         mSliderListenTimeout.addOnChangeListener((slider, value, fromUser) -> {
@@ -174,6 +169,11 @@ public class SettingFrag extends Fragment {
         mSliderDelay.setLabelFormatter(value -> {
             float seconds = value / 1000f; // 转换回秒数
             return String.format(Locale.getDefault(), "%.1fs", seconds);
+        });
+
+        mSliderFinishDelay.setLabelFormatter(value -> {
+            float minutes = value / 60000f;
+            return String.format(Locale.getDefault(), "%.1fm", minutes);
         });
         // Dark Mode
         mRowDarkMode.setOnClickListener(v -> {
@@ -364,7 +364,7 @@ public class SettingFrag extends Fragment {
 
         float finishDelay = SettingManager.getFinishDelay();
         mSliderFinishDelay.setValue(finishDelay);
-        mTvFinishDelayValue.setText(String.format(Locale.getDefault(), "%.1fs", finishDelay / 1000f));
+        mTvFinishDelayValue.setText(String.format(Locale.getDefault(), "%.1fm", finishDelay / 60000f));
 
         int listenTimeout = SettingManager.getListenTimeout();
         mSliderListenTimeout.setValue(listenTimeout);
